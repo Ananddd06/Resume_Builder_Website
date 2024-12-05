@@ -3,6 +3,8 @@ import { Link } from 'react-router-dom';
 import { FaGoogle, FaApple, FaLinkedin } from 'react-icons/fa';
 
 export function Signup() {
+
+  // i need to add the clerk authentication to trigger these kind of social login button 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50">
       <div className="w-full max-w-md bg-white shadow-lg rounded-2xl p-8">
