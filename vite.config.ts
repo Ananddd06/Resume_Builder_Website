@@ -16,10 +16,12 @@ export default defineConfig({
   },
   server: {
     port: 3000, // Development server port
-    open: true, // Automatically open the browser
+    open: true, // Automatically open the browser in development
   },
   build: {
     outDir: 'dist', // Output directory for the production build
-    sourcemap: true, // Generate source maps for easier debugging
+    sourcemap: true, // Generate source maps for debugging
+    emptyOutDir: true, // Clear the output directory before building
   },
+  base: './', // Ensures proper relative paths in production builds
 });
