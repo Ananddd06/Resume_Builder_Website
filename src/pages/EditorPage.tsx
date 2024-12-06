@@ -4,36 +4,87 @@ import Editor from '@monaco-editor/react';
 import html2pdf from 'html2pdf.js';
 import { templates } from '@/data/templates';
 import { Button } from '@/components/ui/Button';
-import { Download } from 'lucide-react';
+import { Download, RotateCw, ChevronLeft, ChevronRight, List } from 'lucide-react';
+
+// Synonym Library
+const synonymLibrary = {
+  team: ["collaborative professional", "group contributor"],
+  managed: ["oversaw", "supervised", "directed"],
+  developed: ["created", "engineered", "designed"],
+  // Add more words as needed
+};
+
+// ATS Keywords List
+const atsKeywords = ["team player", "leadership", "data-driven", "problem-solving", "collaborative"];
+
+// Skills from Job Description
+const skillsFromJob = [
+  "teamwork", "communication", "problem-solving", "JavaScript", "React", "Python", "machine learning", "leadership"
+];
 
 export function EditorPage() {
   const { templateId } = useParams();
-  const template = templates.find(t => t.id === templateId);
+  const template = templates.find((t) => t.id === templateId);
   const [html, setHtml] = useState(template?.defaultHTML || '');
-  const previewRef = useRef<HTMLIFrameElement>(null);
+  const [jobDescription, setJobDescription] = useState('');
+  const [suggestions, setSuggestions] = useState([]);
+  const [atsScore, setAtsScore] = useState(0);
+  const [isRephrasePanelOpen, setRephrasePanelOpen] = useState(false);
+  const [isAtsPanelOpen, setAtsPanelOpen] = useState(false);
+
+  const previewRef = useRef(null);
 
   useEffect(() => {
-    if (template) {
-      setHtml(template.defaultHTML);
+    if (template) setHtml(template.defaultHTML);
+    calculateAtsScore(html, jobDescription);
+    generateRephraseSuggestions(html);
+  }, [template, html, jobDescription]);
+
+  // Function to calculate ATS score
+  const calculateAtsScore = (content, jobDesc) => {
+    const contentLower = content.toLowerCase();
+    const jobDescLower = jobDesc.toLowerCase();
+
+    // Match keywords from job description with resume content
+    const matchedSkills = skillsFromJob.filter((skill) => contentLower.includes(skill.toLowerCase()));
+
+    // If all skills from the job description are found, score 100%
+    if (matchedSkills.length === skillsFromJob.length) {
+      setAtsScore(100); // All skills found
+    } else {
+      // Calculate score based on matched skills percentage
+      const skillMatchPercentage = (matchedSkills.length / skillsFromJob.length) * 100;
+      setAtsScore(isNaN(skillMatchPercentage) ? 0 : skillMatchPercentage);
     }
-  }, [template]);
+  };
+
+  const generateRephraseSuggestions = (content) => {
+    const words = Object.keys(synonymLibrary);
+    const foundSuggestions = words
+      .filter((word) => content.toLowerCase().includes(word))
+      .map((word) => ({
+        word,
+        options: synonymLibrary[word] || [],
+      }));
+    setSuggestions(foundSuggestions);
+  };
+
+  const handleRephrase = (word, replacement) => {
+    const updatedHtml = html.replace(new RegExp(`\\b${word}\\b`, 'gi'), replacement);
+    setHtml(updatedHtml);
+  };
 
   const handleDownload = async () => {
     if (!previewRef.current) return;
-
     const iframe = previewRef.current;
     const element = iframe.contentDocument?.documentElement;
-    
-    if (!element) return;
-
     const opt = {
       margin: 0.5,
       filename: 'resume.pdf',
       image: { type: 'jpeg', quality: 0.98 },
       html2canvas: { scale: 2 },
-      jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
+      jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' },
     };
-
     try {
       await html2pdf().set(opt).from(element).save();
     } catch (error) {
@@ -42,35 +93,55 @@ export function EditorPage() {
   };
 
   return (
-    <div className="h-[calc(100vh-4rem)]">
-      <div className="bg-white border-b border-gray-200 px-4 py-2 flex justify-between items-center">
-        <h1 className="text-lg font-semibold text-gray-900">
-          {template?.title} Template
-        </h1>
-        <Button onClick={handleDownload} className="flex items-center gap-2">
-          <Download className="h-4 w-4" />
-          Download PDF
-        </Button>
+    <div className="h-screen flex flex-col bg-gradient-to-b from-gray-900 via-gray-800 to-gray-900 text-white">
+      {/* Navbar */}
+      <div className="bg-gradient-to-r from-purple-600 to-indigo-600 shadow-lg px-6 py-4 flex justify-between items-center">
+        <h1 className="text-2xl font-bold tracking-wide">{template?.title || "Resume Editor"}</h1>
+        <div className="flex gap-4">
+          <Button
+            variant="ghost"
+            className="text-gray-200 hover:text-white transition"
+            onClick={() => setRephrasePanelOpen(!isRephrasePanelOpen)}
+          >
+            <RotateCw className="h-5 w-5" /> Rephrasing
+          </Button>
+          <Button
+            variant="ghost"
+            className="text-gray-200 hover:text-white transition"
+            onClick={() => setAtsPanelOpen(!isAtsPanelOpen)}
+          >
+            <List className="h-5 w-5" /> ATS Panel
+          </Button>
+          <Button
+            variant="default"
+            className="bg-indigo-600 hover:bg-indigo-700 transition"
+            onClick={handleDownload}
+          >
+            <Download className="h-5 w-5" /> Download PDF
+          </Button>
+        </div>
       </div>
-      <div className="flex h-[calc(100%-3rem)]">
-        <div className="w-1/2 h-full border-r border-gray-200">
+
+      {/* Content */}
+      <div className="flex flex-grow overflow-hidden">
+        {/* Left - Editor */}
+        <div className="w-1/2 bg-gray-800 border-r border-gray-700">
           <Editor
             height="100%"
             defaultLanguage="html"
-            theme="vs-light"
+            theme="vs-dark"
             value={html}
             onChange={(value) => setHtml(value || '')}
             options={{
               minimap: { enabled: false },
               fontSize: 14,
               wordWrap: 'on',
-              lineNumbers: 'on',
-              scrollBeyondLastLine: false,
-              automaticLayout: true,
             }}
           />
         </div>
-        <div className="w-1/2 h-full bg-white">
+
+        {/* Right - Preview */}
+        <div className="w-1/2 relative bg-gray-900 shadow-lg">
           <iframe
             ref={previewRef}
             title="Resume Preview"
@@ -80,6 +151,66 @@ export function EditorPage() {
           />
         </div>
       </div>
+
+      {/* Panels */}
+      {isAtsPanelOpen && (
+        <div className="absolute top-0 right-0 h-full w-80 bg-gray-800 text-white p-4 shadow-md">
+          <Button onClick={() => setAtsPanelOpen(false)} className="text-white">
+            <ChevronRight />
+          </Button>
+          <h2 className="text-xl font-bold mb-4">ATS Scoring Panel</h2>
+          <p className="mb-2 text-gray-400">
+            Based on matching keywords in the job description and resume content.
+          </p>
+          <div className="mb-4">
+            <h3 className="text-lg font-semibold">ATS Score:</h3>
+            <div className="w-full bg-gray-700 rounded-full overflow-hidden h-5 mt-2">
+              <div
+                style={{ width: `${atsScore}%` }}
+                className={`h-full ${atsScore === 100 ? 'bg-green-500' : 'bg-red-500'} rounded-full`}
+              />
+            </div>
+            <p className="text-center mt-2 text-gray-300">{atsScore}%</p>
+          </div>
+          <h3 className="text-lg font-semibold">Matched Keywords:</h3>
+          <ul className="mt-2 list-disc list-inside text-gray-300">
+            {atsKeywords
+              .filter((keyword) => html.toLowerCase().includes(keyword))
+              .map((keyword, idx) => (
+                <li key={idx}>{keyword}</li>
+              ))}
+          </ul>
+        </div>
+      )}
+
+      {isRephrasePanelOpen && (
+        <div className="absolute top-0 left-0 h-full w-80 bg-gray-800 text-white p-4 shadow-md">
+          <Button onClick={() => setRephrasePanelOpen(false)} className="text-white">
+            <ChevronLeft />
+          </Button>
+          <h2 className="text-xl font-bold mb-4">Rephrasing Suggestions</h2>
+          <div>
+            {suggestions.map((suggestion, idx) => (
+              <div key={idx} className="bg-gray-700 p-2 rounded-md shadow-sm hover:bg-gray-600">
+                <p className="text-sm font-medium">{suggestion.word}</p>
+                <div className="flex gap-2 mt-1">
+                  {suggestion.options.map((option, i) => (
+                    <button
+                      key={i}
+                      className="text-sm text-blue-400 hover:underline"
+                      onClick={() => handleRephrase(suggestion.word, option)}
+                    >
+                      {option}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
+
+export default EditorPage;

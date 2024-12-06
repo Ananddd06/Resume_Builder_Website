@@ -7,6 +7,7 @@ import { TemplatesPage } from '@/pages/TemplatesPage';
 import { EditorPage } from '@/pages/EditorPage';
 import { Login } from '@/pages/Login';
 import { Signup } from '@/pages/Signup';
+import { PricingSection } from '@/components/pricing/PricingSection';
 
 const clerkPubKey = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY;
 
@@ -19,6 +20,7 @@ export default function App() {
           <Routes>
             <Route path="/" element={<LandingPage />} />
             <Route path="/templates" element={<TemplatesPage />} />
+            <Route path ='/pricing' element={<PricingSection/>} />
             <Route path="/editor/:templateId" element={<EditorPage />} />
             <Route path="/login" element={<Login />} />
             <Route path="/signup" element={<Signup />} />

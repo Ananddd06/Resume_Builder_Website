@@ -26,13 +26,14 @@ export function Header() {
               Features
               <span className="absolute bottom-0 left-0 h-0.5 w-0 bg-blue-600 transition-all duration-300 font-bold group-hover:w-full"></span>
             </a>
-            <a
-              href="#pricing"
+            {/* Update the href to be a Link component */}
+            <Link
+              to="/pricing"
               className="relative text-gray-600 hover:text-blue-600 font-medium transition duration-300 group"
             >
               Pricing
               <span className="absolute bottom-0 left-0 h-0.5 w-0 bg-blue-600 transition-all duration-300 group-hover:w-full"></span>
-            </a>
+            </Link>
           </nav>
           <Link
             to="/login"
