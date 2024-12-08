@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Lock } from 'lucide-react';
 import { templates } from '@/data/templates';
@@ -6,14 +6,44 @@ import { Button } from '@/components/ui/Button';
 
 export function TemplatesPage() {
   const navigate = useNavigate();
+  const [unlockedTemplates, setUnlockedTemplates] = useState<string[]>([]); // Track unlocked templates
+
+  // Load unlocked templates from localStorage
+  useEffect(() => {
+    const savedTemplates = localStorage.getItem('unlockedTemplates');
+    if (savedTemplates) {
+      setUnlockedTemplates(JSON.parse(savedTemplates));
+    }
+  }, []);
+
+  // Save unlocked templates to localStorage whenever the state changes
+  useEffect(() => {
+    if (unlockedTemplates.length > 0) {
+      localStorage.setItem('unlockedTemplates', JSON.stringify(unlockedTemplates));
+    }
+  }, [unlockedTemplates]);
 
   const handleTemplateClick = (template: typeof templates[0]) => {
-    if (template.premium) {
-      // In a real app, check if user has premium access
-      window.location.hash = 'pricing';
+    if (template.premium && !unlockedTemplates.includes(template.id)) {
+      navigate('/pricing'); // Redirect to payment page if not unlocked
       return;
     }
-    navigate(`/editor/${template.id}`);
+    navigate(`/editor/${template.id}`); // Open editor if unlocked
+  };
+
+  // Simulate fake payment process
+  const handleFakePayment = () => {
+    // Simulate unlocking premium templates after payment
+    setUnlockedTemplates((prevTemplates) => {
+      const newTemplates = [
+        "Modern-Deedy", 
+        "Modern", 
+        "Full Stack Developer"
+      ];
+      // Add only the templates that aren't already unlocked
+      return [...new Set([...prevTemplates, ...newTemplates])];
+    });
+    navigate('/templates'); // Redirect to templates page
   };
 
   return (
@@ -32,7 +62,7 @@ export function TemplatesPage() {
                 alt={template.title}
                 className="w-full h-48 object-cover"
               />
-              {template.premium && (
+              {template.premium && !unlockedTemplates.includes(template.id) && (
                 <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
                   <div className="text-white text-center">
                     <Lock className="h-8 w-8 mx-auto mb-2" />
@@ -48,20 +78,20 @@ export function TemplatesPage() {
                   <template.icon className="h-6 w-6 text-blue-600 mr-2" />
                   <h3 className="text-xl font-semibold text-gray-900">{template.title}</h3>
                 </div>
-                {template.premium && (
+                {template.premium && !unlockedTemplates.includes(template.id) && (
                   <span className="bg-blue-100 text-blue-800 text-xs font-semibold px-2.5 py-0.5 rounded">
                     Premium
                   </span>
                 )}
               </div>
               <p className="text-gray-600">{template.description}</p>
-              {template.premium && (
+              {template.premium && !unlockedTemplates.includes(template.id) && (
                 <Button
                   variant="outline"
                   className="w-full mt-4"
                   onClick={(e) => {
                     e.stopPropagation();
-                    window.location.hash = 'pricing';
+                    navigate('/pricing');
                   }}
                 >
                   Upgrade to Access
@@ -71,6 +101,8 @@ export function TemplatesPage() {
           </div>
         ))}
       </div>
+      {/* Button to simulate the fake payment */}
+      <Button onClick={handleFakePayment}>Fake Payment - Unlock Premium Templates</Button>
     </div>
   );
 }

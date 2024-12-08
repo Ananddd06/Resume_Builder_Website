@@ -1,8 +1,15 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { FileText } from 'lucide-react';
 
 export function Header() {
+  const location = useLocation(); // Hook to get the current route
+
+  // Check if the current path is either '/pricing' or '/payment'
+  if (location.pathname === '/pricing' || location.pathname === '/payment') {
+    return null; // Don't render the header for pricing or payment pages
+  }
+
   return (
     <header className="border-b border-gray-200 bg-white shadow-sm">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -26,7 +33,6 @@ export function Header() {
               Features
               <span className="absolute bottom-0 left-0 h-0.5 w-0 bg-blue-600 transition-all duration-300 font-bold group-hover:w-full"></span>
             </a>
-            {/* Update the href to be a Link component */}
             <Link
               to="/pricing"
               className="relative text-gray-600 hover:text-blue-600 font-medium transition duration-300 group"

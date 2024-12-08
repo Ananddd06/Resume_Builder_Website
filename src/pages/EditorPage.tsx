@@ -4,20 +4,16 @@ import Editor from '@monaco-editor/react';
 import html2pdf from 'html2pdf.js';
 import { templates } from '@/data/templates';
 import { Button } from '@/components/ui/Button';
-import { Download, RotateCw, ChevronLeft, ChevronRight, List } from 'lucide-react';
+import { Download, RotateCw, List, ChevronRight, ChevronLeft } from 'lucide-react';
 
-// Synonym Library
 const synonymLibrary = {
   team: ["collaborative professional", "group contributor"],
   managed: ["oversaw", "supervised", "directed"],
   developed: ["created", "engineered", "designed"],
-  // Add more words as needed
 };
 
-// ATS Keywords List
 const atsKeywords = ["team player", "leadership", "data-driven", "problem-solving", "collaborative"];
 
-// Skills from Job Description
 const skillsFromJob = [
   "teamwork", "communication", "problem-solving", "JavaScript", "React", "Python", "machine learning", "leadership"
 ];
@@ -27,53 +23,43 @@ export function EditorPage() {
   const template = templates.find((t) => t.id === templateId);
   const [html, setHtml] = useState(template?.defaultHTML || '');
   const [jobDescription, setJobDescription] = useState('');
-  const [suggestions, setSuggestions] = useState([]);
   const [atsScore, setAtsScore] = useState(0);
   const [isRephrasePanelOpen, setRephrasePanelOpen] = useState(false);
   const [isAtsPanelOpen, setAtsPanelOpen] = useState(false);
 
   const previewRef = useRef(null);
 
+  // Update content and recalculate ATS score when template or content changes
   useEffect(() => {
-    if (template) setHtml(template.defaultHTML);
-    calculateAtsScore(html, jobDescription);
-    generateRephraseSuggestions(html);
-  }, [template, html, jobDescription]);
+    if (template) {
+      setHtml(template.defaultHTML);
+    }
+  }, [template]);
 
-  // Function to calculate ATS score
+  // Function to calculate ATS score based on job description and content
   const calculateAtsScore = (content, jobDesc) => {
     const contentLower = content.toLowerCase();
     const jobDescLower = jobDesc.toLowerCase();
 
-    // Match keywords from job description with resume content
     const matchedSkills = skillsFromJob.filter((skill) => contentLower.includes(skill.toLowerCase()));
-
-    // If all skills from the job description are found, score 100%
-    if (matchedSkills.length === skillsFromJob.length) {
-      setAtsScore(100); // All skills found
-    } else {
-      // Calculate score based on matched skills percentage
-      const skillMatchPercentage = (matchedSkills.length / skillsFromJob.length) * 100;
-      setAtsScore(isNaN(skillMatchPercentage) ? 0 : skillMatchPercentage);
-    }
+    const skillMatchPercentage = (matchedSkills.length / skillsFromJob.length) * 100;
+    setAtsScore(isNaN(skillMatchPercentage) ? 0 : skillMatchPercentage);
   };
 
-  const generateRephraseSuggestions = (content) => {
-    const words = Object.keys(synonymLibrary);
-    const foundSuggestions = words
-      .filter((word) => content.toLowerCase().includes(word))
-      .map((word) => ({
-        word,
-        options: synonymLibrary[word] || [],
-      }));
-    setSuggestions(foundSuggestions);
+  // Handle content change in the editor
+  const handleEditorChange = (value) => {
+    setHtml(value || '');  // Update HTML state
+    calculateAtsScore(value, jobDescription);  // Recalculate ATS score whenever content changes
   };
 
+  // Handle rephrasing of a specific word
   const handleRephrase = (word, replacement) => {
-    const updatedHtml = html.replace(new RegExp(`\\b${word}\\b`, 'gi'), replacement);
-    setHtml(updatedHtml);
+    const updatedHtml = html.replace(new RegExp(`\\b${word}\\b`, 'g'), replacement);
+    setHtml(updatedHtml);  // Update the HTML state with rephrased text
+    calculateAtsScore(updatedHtml, jobDescription);  // Recalculate ATS score after rephrasing
   };
 
+  // Function to handle PDF download of the resume
   const handleDownload = async () => {
     if (!previewRef.current) return;
     const iframe = previewRef.current;
@@ -130,12 +116,15 @@ export function EditorPage() {
             height="100%"
             defaultLanguage="html"
             theme="vs-dark"
-            value={html}
-            onChange={(value) => setHtml(value || '')}
+            value={html} // Ensure this is linked to the state
+            onChange={handleEditorChange} // Update on change
             options={{
               minimap: { enabled: false },
               fontSize: 14,
               wordWrap: 'on',
+              automaticLayout: true,
+              cursorStyle: 'line',
+              smoothScrolling: true,
             }}
           />
         </div>
@@ -145,7 +134,7 @@ export function EditorPage() {
           <iframe
             ref={previewRef}
             title="Resume Preview"
-            srcDoc={html}
+            srcDoc={html}  // This will update the preview in real-time
             className="w-full h-full"
             sandbox="allow-same-origin"
           />
@@ -190,17 +179,17 @@ export function EditorPage() {
           </Button>
           <h2 className="text-xl font-bold mb-4">Rephrasing Suggestions</h2>
           <div>
-            {suggestions.map((suggestion, idx) => (
-              <div key={idx} className="bg-gray-700 p-2 rounded-md shadow-sm hover:bg-gray-600">
-                <p className="text-sm font-medium">{suggestion.word}</p>
+            {Object.keys(synonymLibrary).map((word) => (
+              <div key={word} className="bg-gray-700 p-2 rounded-md shadow-sm hover:bg-gray-600">
+                <p className="text-sm font-medium">{word}</p>
                 <div className="flex gap-2 mt-1">
-                  {suggestion.options.map((option, i) => (
+                  {synonymLibrary[word].map((replacement, i) => (
                     <button
                       key={i}
                       className="text-sm text-blue-400 hover:underline"
-                      onClick={() => handleRephrase(suggestion.word, option)}
+                      onClick={() => handleRephrase(word, replacement)}
                     >
-                      {option}
+                      {replacement}
                     </button>
                   ))}
                 </div>
@@ -214,3 +203,4 @@ export function EditorPage() {
 }
 
 export default EditorPage;
+ 
