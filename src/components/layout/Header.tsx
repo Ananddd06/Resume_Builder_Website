@@ -1,9 +1,11 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { FileText } from 'lucide-react';
+import { SignedIn, SignedOut, SignInButton, UserButton, useUser } from '@clerk/clerk-react';
 
 export function Header() {
   const location = useLocation(); // Hook to get the current route
+  const { user } = useUser(); // Get user data from Clerk
 
   // Check if the current path is either '/pricing' or '/payment'
   if (location.pathname === '/pricing' || location.pathname === '/payment') {
@@ -41,12 +43,23 @@ export function Header() {
               <span className="absolute bottom-0 left-0 h-0.5 w-0 bg-blue-600 transition-all duration-300 group-hover:w-full"></span>
             </Link>
           </nav>
-          <Link
-            to="/login"
-            className="rounded-md bg-blue-600 px-4 py-2 text-white font-semibold hover:bg-blue-700 transition duration-300"
-          >
-            Login / Signup
-          </Link>
+
+          {/* Render Login/Signup Button based on SignedIn or SignedOut */}
+          <SignedOut>
+            <SignInButton>
+              <button className="rounded-md bg-blue-600 px-4 py-2 text-white font-semibold hover:bg-blue-700 transition duration-300">
+                Login / Signup
+              </button>
+            </SignInButton>
+          </SignedOut>
+
+          <SignedIn>
+            <div className="flex items-center space-x-4">
+              {/* Greeting message with the user's name */}
+              <span className="text-gray-900 text-lg">Hi, {user?.firstName}!</span>
+              <UserButton />
+            </div>
+          </SignedIn>
         </div>
       </div>
     </header>

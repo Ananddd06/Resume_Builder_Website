@@ -12,6 +12,20 @@ export function PaymentPage() {
   const [selectedEmi, setSelectedEmi] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
 
+  const [formData, setFormData] = useState({
+    name: "",
+    cardNumber: "",
+    expiry: "",
+    cvv: "",
+  });
+
+  const [errors, setErrors] = useState({
+    name: "",
+    cardNumber: "",
+    expiry: "",
+    cvv: "",
+  });
+
   const emiOptions = [
     { tenure: "3 months", rate: "2%", installment: "8.49" },
     { tenure: "6 months", rate: "3.5%", installment: "4.37" },
@@ -25,7 +39,43 @@ export function PaymentPage() {
     "Data Science Engineer",
   ];
 
+  const validateForm = () => {
+    let valid = true;
+    const newErrors = { name: "", cardNumber: "", expiry: "", cvv: "" };
+
+    if (!formData.name) {
+      newErrors.name = "Name on Card is required.";
+      valid = false;
+    }
+
+    const cardNumberPattern = /^[0-9]{16}$/;
+    if (!formData.cardNumber || !cardNumberPattern.test(formData.cardNumber)) {
+      newErrors.cardNumber = "Please enter a valid 16-digit card number.";
+      valid = false;
+    }
+
+    const expiryPattern = /^(0[1-9]|1[0-2])\/\d{2}$/;
+    if (!formData.expiry || !expiryPattern.test(formData.expiry)) {
+      newErrors.expiry = "Please enter a valid expiry date (MM/YY).";
+      valid = false;
+    }
+
+    const cvvPattern = /^[0-9]{3}$/;
+    if (!formData.cvv || !cvvPattern.test(formData.cvv)) {
+      newErrors.cvv = "Please enter a valid 3-digit CVV.";
+      valid = false;
+    }
+
+    setErrors(newErrors);
+    return valid;
+  };
+
   const handlePayment = async () => {
+    if (!validateForm()) {
+      alert("Please fix the errors in the form before proceeding.");
+      return;
+    }
+
     setIsLoading(true);
 
     try {
@@ -146,8 +196,11 @@ export function PaymentPage() {
                     id="name"
                     className="w-full px-4 py-2 border border-gray-600 bg-gray-900 text-gray-300 rounded-lg focus:ring focus:ring-indigo-300"
                     placeholder="John Doe"
+                    value={formData.name}
+                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                     required
                   />
+                  {errors.name && <p className="text-red-500 text-sm">{errors.name}</p>}
                 </div>
                 <div className="mb-4">
                   <label
@@ -161,8 +214,11 @@ export function PaymentPage() {
                     id="cardNumber"
                     className="w-full px-4 py-2 border border-gray-600 bg-gray-900 text-gray-300 rounded-lg focus:ring focus:ring-indigo-300"
                     placeholder="1234 5678 9012 3456"
+                    value={formData.cardNumber}
+                    onChange={(e) => setFormData({ ...formData, cardNumber: e.target.value })}
                     required
                   />
+                  {errors.cardNumber && <p className="text-red-500 text-sm">{errors.cardNumber}</p>}
                 </div>
                 <div className="flex gap-4 mb-4">
                   <div className="flex-1">
@@ -174,8 +230,11 @@ export function PaymentPage() {
                       id="expiry"
                       className="w-full px-4 py-2 border border-gray-600 bg-gray-900 text-gray-300 rounded-lg focus:ring focus:ring-indigo-300"
                       placeholder="MM/YY"
+                      value={formData.expiry}
+                      onChange={(e) => setFormData({ ...formData, expiry: e.target.value })}
                       required
                     />
+                    {errors.expiry && <p className="text-red-500 text-sm">{errors.expiry}</p>}
                   </div>
                   <div className="flex-1">
                     <label htmlFor="cvv" className="block text-gray-300 font-medium">
@@ -186,8 +245,11 @@ export function PaymentPage() {
                       id="cvv"
                       className="w-full px-4 py-2 border border-gray-600 bg-gray-900 text-gray-300 rounded-lg focus:ring focus:ring-indigo-300"
                       placeholder="123"
+                      value={formData.cvv}
+                      onChange={(e) => setFormData({ ...formData, cvv: e.target.value })}
                       required
                     />
+                    {errors.cvv && <p className="text-red-500 text-sm">{errors.cvv}</p>}
                   </div>
                 </div>
 

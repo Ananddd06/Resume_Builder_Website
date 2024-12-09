@@ -1,6 +1,7 @@
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Check, X } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
-import { useNavigate } from 'react-router-dom';
 
 const plans = [
   {
@@ -38,13 +39,14 @@ const plans = [
 
 export function PricingSection() {
   const navigate = useNavigate();
+  const [loading, setLoading] = useState(false);
 
-  const handlePlanSelection = (planName: string) => {
+  const handlePlanSelection = async (planName: string) => {
     if (planName === 'Free') {
-      // Redirect to the Templates page for the Free plan
       navigate('/templates');
-    } else {
-      navigate(`/payment?plan=${planName}`);
+    } else if (planName === 'Premium') {
+      // Redirect to the payment page directly for the Premium plan
+      navigate('/payment');
     }
   };
 
@@ -68,7 +70,7 @@ export function PricingSection() {
                 <h3 className="text-2xl font-bold text-gray-900 mb-4">{plan.name}</h3>
                 <div className="mb-6">
                   <span className="text-4xl font-bold">
-                    ${plan.price === 0 ? 'Free' : plan.price.toFixed(2)}
+                    {plan.price === 0 ? 'Free' : `$${plan.price.toFixed(2)}`}
                   </span>
                   {plan.price > 0 && <span className="text-gray-600">/month</span>}
                 </div>
@@ -90,11 +92,18 @@ export function PricingSection() {
 
                 <Button
                   className={`w-full mt-8 ${
-                    plan.name === 'Premium' ? 'bg-indigo-600 text-white' : 'border-indigo-600'
+                    plan.name === 'Premium'
+                      ? 'bg-indigo-600 text-white'
+                      : 'border-indigo-600 text-indigo-600'
                   }`}
                   onClick={() => handlePlanSelection(plan.name)}
+                  disabled={loading}
                 >
-                  {plan.name === 'Free' ? 'Get Started' : 'Upgrade Now'}
+                  {loading && plan.name === 'Premium'
+                    ? 'Processing...'
+                    : plan.name === 'Free'
+                    ? 'Get Started'
+                    : 'Upgrade Now'}
                 </Button>
               </div>
             </div>

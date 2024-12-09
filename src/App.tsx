@@ -1,4 +1,4 @@
-import React from 'react';
+// Import necessary modules
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { ClerkProvider } from '@clerk/clerk-react';
 import { Header } from '@/components/layout/Header';
@@ -10,6 +10,7 @@ import { Signup } from '@/pages/Signup';
 import { PaymentPage } from '@/pages/PaymentPage';
 import { PricingSection } from '@/components/pricing/PricingSection';
 
+// Fetch the Clerk Publishable Key from environment variables
 const clerkPubKey = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY;
 
 export default function App() {
@@ -17,8 +18,9 @@ export default function App() {
     <ClerkProvider publishableKey={clerkPubKey}>
       <BrowserRouter>
         <div className="min-h-screen bg-gray-50">
-          {/* Common Header */}
+          {/* Common Header for all pages */}
           <Header />
+
           {/* Define Routes */}
           <Routes>
             <Route path="/" element={<LandingPage />} />
