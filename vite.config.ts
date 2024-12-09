@@ -10,8 +10,7 @@ export default defineConfig({
   },
   resolve: {
     alias: {
-      // Use "@" as a shortcut for the "./src" directory
-      '@': path.resolve(__dirname, './src'),
+      '@': path.resolve(__dirname, './src'), // Use "@" as a shortcut for the "./src" directory
     },
   },
   server: {
@@ -23,5 +22,5 @@ export default defineConfig({
     sourcemap: true, // Generate source maps for debugging
     emptyOutDir: true, // Clear the output directory before building
   },
-  base: './', // Ensures proper relative paths in production builds
+  base: '/', // For root deployment on Vercel or change if deploying to subdirectory
 });
