@@ -1,4 +1,4 @@
-# Resume_Builder_Website
+<img width="1668" alt="Screenshot 2024-12-09 at 12 06 13" src="https://github.com/user-attachments/assets/2339d991-ce5b-451b-9e63-607db0e3d01e"># Resume_Builder_Website
 A modern and dynamic Resume Builder web application that allows users to create, edit, and download their resumes with various customizable templates. The app uses Clerk for authentication, enabling users to log in or sign up securely. With a live editor for resumes, users can make real-time changes to their resumes. The app also features rephrasing tools, an ATS (Applicant Tracking System) score panel, and a downloadable PDF resume option. Additionally, there's a premium template available with a fake payment gateway integration (using Braintree) for users who wish to create high-quality resumes quickly.
 
 Features
@@ -34,6 +34,18 @@ Payment Integration (Fake): Braintree
 API Integration: Braintree, Body-Parser
 Build Tool: Vite
 Other Libraries: html-docx-js, katex, react-icons
+
+<img width="557" alt="Screenshot 2024-12-09 at 12 05 38" src="https://github.com/user-attachments/assets/728c2b1c-55f2-4c55-ab6f-3b2b0809ef9d">
+<img width="1146" alt="Screenshot 2024-12-09 at 12 05 45" src="https://github.com/user-attachments/assets/3b6adb2a-64ff-4a78-9b7e-43bbe07f85db">
+<img width="1359" alt="Screenshot 2024-12-09 at 12 06 03" src="https://github.com/user-attachments/assets/fb8e726c-3227-493a-bbf3-5ab04a0d6363">
+<img width="1668" alt="Screenshot 2024-12-09 at 12 06 13" src="https://github.com/user-attachments/assets/c432375f-e1d9-42a0-8857-7b957fcad784">
+<img width="1668" alt="Screenshot 2024-12-09 at 12 06 22" src="https://github.com/user-attachments/assets/f282a3d0-de4b-4460-b002-d3e697fd72b3">
+<img width="313" alt="Screenshot 2024-12-09 at 12 06 31" src="https://github.com/user-attachments/assets/ae520b28-d9a5-478c-8d98-b4fbd8e8e3dc">
+<img width="321" alt="Screenshot 2024-12-09 at 12 06 37" src="https://github.com/user-attachments/assets/01000740-29a9-455a-a117-27ee2b55856f">
+<img width="1278" alt="Screenshot 2024-12-09 at 12 06 50" src="https://github.com/user-attachments/assets/adb1fae0-e46a-4360-84ab-ef6771b863df">
+<img width="1082" alt="Screenshot 2024-12-09 at 12 07 00" src="https://github.com/user-attachments/assets/21bb6772-633b-425c-9516-5bccd8947384">
+<img width="846" alt="Screenshot 2024-12-09 at 12 07 05" src="https://github.com/user-attachments/assets/3d7c4005-ee6f-4e8f-95d9-f88daaa32969">
+<img width="1672" alt="Screenshot 2024-12-09 at 12 05 16" src="https://github.com/user-attachments/assets/6f289c7a-4834-471d-9cb1-3089b79871c8">
 
 
 
@@ -78,4 +90,4 @@ The score will update as you make changes, and the app will suggest improvements
 Once your resume is ready, click the "Download Resume" button to generate a PDF of your resume.
 The downloaded file will be ready for submission to potential employers.
 6. Premium Template & Payment
-If you want access to premium templates, you can use the fake Braintree payment integration to simulate a payment for the premium features. This allows users to access premium templates after simulating a successful transaction.
+If you want access to premium templates, you can use the fake Braintree payment integration to simulate a payment for the premium features. This allows users to access premium templates after simulating a successful transaction .
